@@ -1,12 +1,21 @@
 package main
 
 import (
+	"fmt"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/pithawatnuckong/go-clean/configuration"
+	"github.com/pithawatnuckong/go-clean/controller"
 	"github.com/pithawatnuckong/go-clean/environment"
+	"github.com/pithawatnuckong/go-clean/exception"
 	repository "github.com/pithawatnuckong/go-clean/repository/impl"
+	service "github.com/pithawatnuckong/go-clean/service/impl"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
+
+// TODO apply log
 
 func main() {
 	config, finder := environment.NewEnvironment()
@@ -15,35 +24,22 @@ func main() {
 
 	// repositories
 	productRepository := repository.NewProductRepositoryDBImpl(database)
-	_ = productRepository
 
-	//createEntity := entity.Product{
-	//	Name:      "Zebra toy",
-	//	Price:     50.00,
-	//	Quantity:  2,
-	//	OwnerID:   1,
-	//	CreatedAt: time.Now(),
-	//	UpdatedAt: sql.NullTime{Time: time.Now(), Valid: false},
-	//	DeletedAt: sql.NullTime{Time: time.Now(), Valid: false},
-	//}
-	//productRepository.Create(context.Background(), createEntity)
+	// services
+	productService := service.NewProductServiceImpl(&productRepository)
 
-	//foundProduct := productRepository.FindById(context.Background(), 4)
-	//logs.Info("Find product by ID", zap.Any("product", foundProduct))
+	// controllers
+	productController := controller.NewProductController(&productService)
 
-	//updateEntity := entity.Product{
-	//	ID:        4,
-	//	Name:      "Zebraa1",
-	//	Price:     50.21,
-	//	Quantity:  1,
-	//	UpdatedAt: sql.NullTime{Time: time.Now(), Valid: true},
-	//}
-	//productRepository.Update(context.Background(), updateEntity)
+	// set-up fiber
+	app := fiber.New(configuration.NewFiberConfiguration())
+	app.Use(recover.New())
+	app.Use(cors.New(configuration.NewCorsConfiguration()))
 
-	//productRepository.Delete(context.Background(), 4)
+	productController.Route(app)
 
-	//allProducts := productRepository.FindAll(context.Background())
-	//logs.Info("Find all ", zap.Any("products", allProducts))
+	err := app.Listen(fmt.Sprintf(":%v", finder.Get("server.port")))
+	exception.PanicLogging(err)
 
 	defer func(database *gorm.DB, logger *zap.Logger) {
 		postgres, _ := database.DB()
