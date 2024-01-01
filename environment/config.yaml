@@ -8,3 +8,9 @@ database:
   password: postgres
   name: postgres
   sslmode: disable
+
+logging:
+  level: ERROR
+
+# OS ENV
+app_env: development

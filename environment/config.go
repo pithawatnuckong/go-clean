@@ -1,4 +1,4 @@
-package env
+package environment
 
 import (
 	"github.com/pithawatnuckong/go-clean/exception"
@@ -15,14 +15,19 @@ type DatabaseEnv struct {
 	SslMode  string
 }
 
+type LoggingEnv struct {
+	Level string
+}
+
 type Configuration struct {
 	Database DatabaseEnv
+	Logging  LoggingEnv
 }
 
 func NewEnvironment() (*Configuration, Environment) {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath("env")
+	viper.AddConfigPath("environment")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
 
