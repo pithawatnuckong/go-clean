@@ -36,6 +36,7 @@ func NewDatabase(environment environment.DatabaseEnv) *gorm.DB {
 
 	db, err := gorm.Open(dial, &gorm.Config{
 		Logger: loggerDB,
+		//DryRun: true,
 	})
 	exception.PanicLogging(err)
 
