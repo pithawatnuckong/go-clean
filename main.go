@@ -41,10 +41,12 @@ func main() {
 	err := app.Listen(fmt.Sprintf(":%v", finder.Get("server.port")))
 	exception.PanicLogging(err)
 
-	defer func(database *gorm.DB, logger *zap.Logger) {
-		postgres, _ := database.DB()
+	defer terminate(database, logs)
+}
 
-		_ = postgres.Close()
-		_ = logger.Sync()
-	}(database, logs)
+func terminate(database *gorm.DB, logger *zap.Logger) {
+	postgres, _ := database.DB()
+
+	_ = postgres.Close()
+	_ = logger.Sync()
 }
