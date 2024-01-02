@@ -28,7 +28,7 @@ func (controller ProductController) CreateProduct(ctx *fiber.Ctx) error {
 	response := controller.productService.CreateProduct(ctx.Context(), body)
 
 	return ctx.Status(fiber.StatusCreated).JSON(model.GeneralResponseModel{
-		Code:    "P201",
+		Code:    "201",
 		Message: "Created",
 		Data:    response,
 	})

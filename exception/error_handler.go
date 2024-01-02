@@ -10,14 +10,14 @@ func ErrorHandler(ctx *fiber.Ctx, err error) error {
 	if validateError {
 		message := err.Error()
 		return ctx.Status(fiber.StatusBadRequest).JSON(model.GeneralResponseModel{
-			Code:    "P400",
+			Code:    "400",
 			Message: "Bad Request",
 			Data:    message,
 		})
 	}
 
 	return ctx.Status(fiber.StatusInternalServerError).JSON(model.GeneralResponseModel{
-		Code:    "P500",
+		Code:    "500",
 		Message: "General Error",
 		Data:    err.Error(),
 	})
