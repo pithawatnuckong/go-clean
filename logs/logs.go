@@ -1,4 +1,4 @@
-package configuration
+package logs
 
 import (
 	"github.com/pithawatnuckong/go-clean/environment"
@@ -9,23 +9,38 @@ import (
 )
 
 const (
-	PRODUCTION = "production"
-
-	INFO  = "INFO"
-	DEBUG = "DEBUG"
-	ERROR = "ERROR"
-	FATAL = "FATAL"
+	production = "production"
 )
 
-func NewZapLogging(configuration environment.LoggingEnv, finder environment.Environment) *zap.Logger {
-	var logger *zap.Logger
+var logs *zap.Logger
 
-	logger = zap.Must(newProduction(loggingLevel(configuration.Level)))
-	if strings.ToLower(finder.Get("APP_ENV")) != PRODUCTION {
-		logger = zap.Must(zap.NewDevelopment())
+func NewCustomerLogger(configuration environment.LoggingEnv, finder environment.Environment) {
+
+	logs = zap.Must(newProduction(loggingLevel(configuration.Level)))
+	if strings.ToLower(finder.Get("APP_ENV")) != production {
+		logs = zap.Must(zap.NewDevelopment())
 	}
+}
 
-	return logger
+func Info(message string, fields ...zapcore.Field) {
+	logs.Info(message, fields...)
+}
+
+func Debug(message string, fields ...zapcore.Field) {
+	logs.Debug(message, fields...)
+}
+
+func Error(message interface{}, fields ...zapcore.Field) {
+	switch t := message.(type) {
+	case error:
+		logs.Error(t.Error(), fields...)
+	case string:
+		logs.Error(t, fields...)
+	}
+}
+
+func Fatal(message string, fields ...zapcore.Field) {
+	logs.Fatal(message, fields...)
 }
 
 func newProduction(level zapcore.Level) (*zap.Logger, error) {
@@ -56,6 +71,12 @@ func newProduction(level zapcore.Level) (*zap.Logger, error) {
 }
 
 func loggingLevel(level string) zapcore.Level {
+	const (
+		INFO  = "INFO"
+		DEBUG = "DEBUG"
+		ERROR = "ERROR"
+		FATAL = "FATAL"
+	)
 	switch level {
 	case INFO:
 		return zapcore.InfoLevel

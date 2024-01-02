@@ -11,9 +11,9 @@ import (
 	"github.com/pithawatnuckong/go-clean/controller"
 	"github.com/pithawatnuckong/go-clean/environment"
 	"github.com/pithawatnuckong/go-clean/exception"
+	"github.com/pithawatnuckong/go-clean/logs"
 	repository "github.com/pithawatnuckong/go-clean/repository/impl"
 	service "github.com/pithawatnuckong/go-clean/service/impl"
-	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -22,8 +22,8 @@ import (
 func main() {
 	config, finder := environment.NewEnvironment()
 	database := configuration.NewDatabase(config.Database)
-	logs := configuration.NewZapLogging(config.Logging, finder)
-	defer terminate(database, logs)
+	logs.NewCustomerLogger(config.Logging, finder)
+	defer terminate(database)
 
 	// repositories
 	productRepository := repository.NewProductRepositoryDBImpl(database)
@@ -48,9 +48,8 @@ func main() {
 	exception.PanicLogging(err)
 }
 
-func terminate(database *gorm.DB, logger *zap.Logger) {
+func terminate(database *gorm.DB) {
 	postgres, _ := database.DB()
 
 	_ = postgres.Close()
-	_ = logger.Sync()
 }
