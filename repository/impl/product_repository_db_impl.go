@@ -2,6 +2,7 @@ package impl
 
 import (
 	"context"
+	"errors"
 	"github.com/pithawatnuckong/go-clean/entity"
 	"github.com/pithawatnuckong/go-clean/exception"
 	"github.com/pithawatnuckong/go-clean/repository"
@@ -42,6 +43,10 @@ func (repository productRepositoryDBImpl) FindAll(ctx context.Context) (products
 
 func (repository productRepositoryDBImpl) FindById(ctx context.Context, id int) (product *entity.Product) {
 	err := repository.database.WithContext(ctx).Where("product_id=?", id).Where("deleted_at IS null").First(&product).Error
-	exception.PanicLogging(err)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil
+	} else {
+		exception.PanicLogging(err)
+	}
 	return product
 }

@@ -12,5 +12,10 @@ database:
 logging:
   level: ERROR
 
+redis:
+  host: localhost
+  password: password
+  port: 6379
+
 # OS ENV
 app_env: development

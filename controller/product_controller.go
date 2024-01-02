@@ -18,6 +18,7 @@ func NewProductController(productService *service.ProductService) ProductControl
 func (controller ProductController) Route(app *fiber.App) {
 	router := app.Group("/api/v1/products")
 	router.Post("/create", controller.CreateProduct)
+	router.Get("/:id", controller.FindProduct)
 }
 
 func (controller ProductController) CreateProduct(ctx *fiber.Ctx) error {
@@ -29,7 +30,20 @@ func (controller ProductController) CreateProduct(ctx *fiber.Ctx) error {
 
 	return ctx.Status(fiber.StatusCreated).JSON(model.GeneralResponseModel{
 		Code:    "201",
-		Message: "Created",
+		Message: "created",
+		Data:    response,
+	})
+}
+
+func (controller ProductController) FindProduct(ctx *fiber.Ctx) error {
+	id, err := ctx.ParamsInt("id")
+	exception.PanicLogging(err)
+
+	response := controller.productService.FindProduct(ctx.Context(), id)
+
+	return ctx.JSON(model.GeneralResponseModel{
+		Code:    "200",
+		Message: "ok",
 		Data:    response,
 	})
 }

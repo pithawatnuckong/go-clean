@@ -19,9 +19,16 @@ type LoggingEnv struct {
 	Level string
 }
 
+type RedisEnv struct {
+	Host     string
+	Password string
+	Port     int
+}
+
 type Configuration struct {
 	Database DatabaseEnv
 	Logging  LoggingEnv
+	Redis    RedisEnv
 }
 
 func NewEnvironment() (*Configuration, Environment) {

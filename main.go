@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/go-redis/redis/v8"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -17,13 +18,16 @@ import (
 	"gorm.io/gorm"
 )
 
-// TODO apply log
+// TODO implement error log
 
 func main() {
 	config, finder := environment.NewEnvironment()
 	database := configuration.NewDatabase(config.Database)
+	redisClient := configuration.NewRedis(config.Redis)
+
+	defer terminate(database, redisClient)
+
 	logs.NewCustomerLogger(config.Logging, finder)
-	defer terminate(database)
 
 	// repositories
 	productRepository := repository.NewProductRepositoryDBImpl(database)
@@ -48,8 +52,9 @@ func main() {
 	exception.PanicLogging(err)
 }
 
-func terminate(database *gorm.DB) {
+func terminate(database *gorm.DB, redisClient *redis.Client) {
 	postgres, _ := database.DB()
 
 	_ = postgres.Close()
+	_ = redisClient.Close()
 }
