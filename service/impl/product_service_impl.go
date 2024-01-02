@@ -2,7 +2,8 @@ package impl
 
 import (
 	"context"
-	"fmt"
+	"github.com/go-redis/redis/v8"
+	"github.com/pithawatnuckong/go-clean/configuration"
 	"github.com/pithawatnuckong/go-clean/entity"
 	"github.com/pithawatnuckong/go-clean/exception"
 	"github.com/pithawatnuckong/go-clean/model"
@@ -14,10 +15,11 @@ import (
 
 type productServiceImpl struct {
 	productRepository repository.ProductRepository
+	redisClient       *redis.Client
 }
 
-func NewProductServiceImpl(productRepository *repository.ProductRepository) service.ProductService {
-	return productServiceImpl{productRepository: *productRepository}
+func NewProductServiceImpl(productRepository *repository.ProductRepository, redisClient *redis.Client) service.ProductService {
+	return productServiceImpl{productRepository: *productRepository, redisClient: redisClient}
 }
 
 func (service productServiceImpl) CreateProduct(ctx context.Context, request model.ProductCreateOrUpdateModel) *model.ProductCreateOrUpdateModel {
@@ -54,12 +56,14 @@ func (service productServiceImpl) FindProduct(ctx context.Context, id int) *mode
 		})
 	}
 
-	product := service.productRepository.FindById(ctx, id)
-	if product == nil {
-		panic(exception.ValidationError{
-			Message: fmt.Sprintf("Produt ID %v not found.", id),
-		})
-	}
+	//product := service.productRepository.FindById(ctx, id)
+	//if product == nil {
+	//	panic(exception.ValidationError{
+	//		Message: fmt.Sprintf("Produt ID %v not found.", id),
+	//	})
+	//}
+
+	product := configuration.FindByIdAndSetCache[entity.Product](service.redisClient, ctx, "product", id, service.productRepository.FindById)
 
 	return &model.ProductModel{
 		ID:        product.ID,

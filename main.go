@@ -33,7 +33,7 @@ func main() {
 	productRepository := repository.NewProductRepositoryDBImpl(database)
 
 	// services
-	productService := service.NewProductServiceImpl(&productRepository)
+	productService := service.NewProductServiceImpl(&productRepository, redisClient)
 
 	// controllers
 	productController := controller.NewProductController(&productService)
