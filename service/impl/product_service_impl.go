@@ -63,7 +63,7 @@ func (service productServiceImpl) FindProduct(ctx context.Context, id int) *mode
 	//	})
 	//}
 
-	product := configuration.FindByIdAndSetCache[entity.Product](service.redisClient, ctx, "product", id, service.productRepository.FindById)
+	product := configuration.FindByIdAndSetCache[entity.Product, int](service.redisClient, ctx, "product", id, service.productRepository.FindById)
 
 	return &model.ProductModel{
 		ID:        product.ID,

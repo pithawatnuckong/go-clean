@@ -18,7 +18,7 @@ func NewRedis(config environment.RedisEnv) *redis.Client {
 	})
 }
 
-func FindByIdAndSetCache[T any](redisClient *redis.Client, ctx context.Context, prefix string, id int, findByIdFn func(ctx context.Context, id int) *T) *T {
+func FindByIdAndSetCache[T any, ID int | string](redisClient *redis.Client, ctx context.Context, prefix string, id ID, findByIdFn func(ctx context.Context, id ID) *T) *T {
 	key := fmt.Sprintf("%v:%v", prefix, id)
 	var data []byte
 	var response T
