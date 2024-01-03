@@ -31,8 +31,6 @@ type Configuration struct {
 	Redis    RedisEnv
 }
 
-// TODO configuration each for state
-
 func NewEnvironment() (*Configuration, Environment) {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
