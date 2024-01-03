@@ -2,7 +2,7 @@ server:
   port: 8080
 
 database:
-  host: localhost
+  host: host.docker.internal # localhost
   port: 5432
   username: postgres
   password: postgres
@@ -10,10 +10,10 @@ database:
   sslmode: disable
 
 logging:
-  level: ERROR
+  level: INFO
 
 redis:
-  host: localhost
+  host: host.docker.internal # localhost
   password: password
   port: 6379
 

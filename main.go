@@ -22,12 +22,12 @@ import (
 
 func main() {
 	config, finder := environment.NewEnvironment()
+	logs.NewCustomerLogger(config.Logging, finder)
+
 	database := configuration.NewDatabase(config.Database)
 	redisClient := configuration.NewRedis(config.Redis)
 
 	defer terminate(database, redisClient)
-
-	logs.NewCustomerLogger(config.Logging, finder)
 
 	// repositories
 	productRepository := repository.NewProductRepositoryDBImpl(database)
@@ -48,8 +48,15 @@ func main() {
 	// routes
 	productController.Route(app)
 
+	// health check
+	app.Get("/health", healthCheckController)
+
 	err := app.Listen(fmt.Sprintf(":%v", finder.Get("server.port")))
 	exception.PanicLogging(err)
+}
+
+func healthCheckController(ctx *fiber.Ctx) error {
+	return ctx.SendString("OK")
 }
 
 func terminate(database *gorm.DB, redisClient *redis.Client) {
