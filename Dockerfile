@@ -10,7 +10,9 @@ RUN go build -o artifact .
 
 FROM alpine:latest
 COPY --from=builder /app/artifact /app/main
-COPY environment/config.yaml /environment/config.yaml
+
+# k8s configmap
+#COPY environment/config.yaml /environment/config.yaml
 
 EXPOSE 8080
 ENTRYPOINT ["/app/main"]

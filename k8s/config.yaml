@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: go-configmap
+  namespace: go-app
+data:
+  config.yaml: |+
+    server:
+      port: 8080
+
+    database:
+      host: host.minikube.internal # localhost
+      port: 5432
+      username: postgres
+      password: postgres
+      name: postgres
+      sslmode: disable
+
+    logging:
+      level: INFO
+
+    redis:
+    #  host: host.docker.internal # docker
+      host: host.minikube.internal # minikube
+      password: password
+      port: 6379
+
+    # OS ENV
+    #app_env: development

@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-deployment
+  namespace: go-app
+spec:
+  replicas: 1 # scale as you want
+  selector:
+    matchLabels:
+      app: go-deployment
+  template:
+    metadata:
+      labels:
+        app: go-deployment
+    spec:
+      containers:
+        - name: go-app
+          image: go-app:v0.0.1 # default is :latest
+          imagePullPolicy: Never # local
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "512m"
+          #            requests:
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe: # running probe
+            httpGet:
+              path: /health
+              port: 8080
+            failureThreshold: 2
+            periodSeconds: 30
+          readinessProbe: # initial probe
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            failureThreshold: 2
+            periodSeconds: 15
+          env:
+            - name: APP_ENV
+              value: 'development'
+          volumeMounts:
+            - name: go-config
+              mountPath: /environment
+      volumes:
+        - name: go-config
+          configMap:
+            name: go-configmap
+
