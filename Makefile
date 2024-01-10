@@ -1,5 +1,8 @@
-start:
+run-build:
 	cd server && docker-compose up -d
+
+run-dev:
+	cd shells && exec run_go.sh
 
 apply:
 	kubectl apply -f k8s/service.yaml

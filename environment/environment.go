@@ -2,7 +2,6 @@ package environment
 
 import (
 	"github.com/spf13/viper"
-	"os"
 )
 
 type Environment interface {
@@ -12,8 +11,5 @@ type Environment interface {
 type environmentImpl struct{}
 
 func (config *environmentImpl) Get(key string) string {
-	if value, ok := os.LookupEnv(key); ok {
-		return value
-	}
 	return viper.GetString(key)
 }

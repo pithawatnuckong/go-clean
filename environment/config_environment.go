@@ -3,6 +3,7 @@ package environment
 import (
 	"github.com/pithawatnuckong/go-clean/exception"
 	"github.com/spf13/viper"
+	"os"
 	"strings"
 )
 
@@ -42,6 +43,9 @@ func NewEnvironment() (*Configuration, Environment) {
 
 	var configuration Configuration
 	exception.PanicLogging(viper.Unmarshal(&configuration))
+
+	// Bind OS environment for viper
+	exception.PanicLogging(viper.BindEnv(os.Environ()...))
 
 	return &configuration, &environmentImpl{}
 }

@@ -16,6 +16,3 @@ redis:
   host: host.docker.internal # localhost
   password: password
   port: 6379
-
-# OS ENV
-app_env: development
